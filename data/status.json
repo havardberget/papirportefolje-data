@@ -1,9 +1,15 @@
 {
-  "run_at_utc": "2026-11-01T17:53:26Z",
+  "run_at_utc": "2026-11-01T18:24:58Z",
   "mode": "all",
-  "api_calls": 10,
+  "api_calls": 12,
   "prices_added": 0,
   "dividend_rows": 2,
+  "account": {
+    "apiRequests": 20,
+    "apiRequestsDate": "2026-11-01",
+    "dailyRateLimit": 20,
+    "extraLimit": 462
+  },
   "notes": [],
   "errors": []
 }
