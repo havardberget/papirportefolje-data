@@ -1,0 +1,11 @@
+{
+  "run_at_utc": "2026-11-01T17:52:19Z",
+  "mode": "all",
+  "api_calls": 31,
+  "prices_added": 21,
+  "dividend_rows": 2,
+  "notes": [
+    "OBX hentet som OBX.INDX"
+  ],
+  "errors": []
+}
