@@ -22,7 +22,8 @@ import urllib.request
 
 BASE = "https://eodhd.com/api"
 START = "2026-10-30"
-DIV_FROM = "2026-10-01"
+DIV_FROM = "2026-10-01"      # utbytte med ex-dato fra og med denne lagres
+DIV_HISTORY = "2024-01-01"   # lengre historikk brukes bare til å flagge avvikende beløp
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TOKEN = os.environ.get("EODHD_API_TOKEN", "")
 MODES = {"prices-daily", "prices-full", "dividends", "all"}
@@ -192,7 +193,7 @@ def update_dividends(tickers, universe):
     new_rows = []
     for t in tickers:
         sym = universe[t][0]
-        data = get(f"div/{sym}", **{"from": DIV_FROM})
+        data = get(f"div/{sym}", **{"from": DIV_HISTORY})
         if not isinstance(data, list):
             keep += [r for r in old if r["ticker"] == t]  # behold gamle rader ved feil
             continue
@@ -203,22 +204,28 @@ def update_dividends(tickers, universe):
                 continue
             cur = (d.get("currency") or "NOK").upper()
             ex = (d.get("date") or "")[:10]
-            fx = 1.0 if cur == "NOK" else fx_rate(f"{cur}NOK", min(ex, oslo_today().isoformat()), cache)
+            if cur == "NOK":
+                fx = 1.0
+            elif ex >= DIV_FROM:
+                fx = fx_rate(f"{cur}NOK", min(ex, oslo_today().isoformat()), cache)
+            else:
+                fx = None  # eldre utbytte i annen valuta trengs ikke omregnet
             rows_t.append({
                 "ticker": t, "ex_date": ex, "pay_date": (d.get("paymentDate") or "")[:10],
                 "declared": (d.get("declarationDate") or "")[:10], "value": f"{v:g}",
                 "currency": cur, "fx": "" if fx is None else f"{fx:g}",
                 "value_nok": "" if fx is None else f"{round(v * fx, 4):g}", "flag": "",
             })
-        # Flagg beløp som avviker kraftig fra de andre (f.eks. feil valuta)
-        vals = [float(r["value_nok"]) for r in rows_t if r["value_nok"]]
-        med = statistics.median(vals) if len(vals) >= 3 else None
+        # Flagg beløp som avviker kraftig fra tidligere utbytte i samme valuta (f.eks. feil valuta)
         for r in rows_t:
+            same = [float(x["value"]) for x in rows_t if x["currency"] == r["currency"]]
+            med = statistics.median(same) if len(same) >= 3 else None
+            v = float(r["value"])
             if not r["value_nok"]:
                 r["flag"] = "mangler valutakurs"
-            elif med and (float(r["value_nok"]) < med / 4 or float(r["value_nok"]) > med * 4):
+            elif med and (v < med / 4 or v > med * 4):
                 r["flag"] = "sjekk beløp/valuta"
-        new_rows += rows_t
+        new_rows += [r for r in rows_t if r["ex_date"] >= DIV_FROM]
     rows = sorted(keep + new_rows, key=lambda r: (r["ex_date"], r["ticker"]))
     write_csv("dividends.csv", ["ticker", "ex_date", "pay_date", "declared", "value",
                                 "currency", "fx", "value_nok", "flag"], rows)
