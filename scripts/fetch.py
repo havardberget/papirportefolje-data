@@ -241,6 +241,15 @@ def account_usage():
     return {k: data.get(k) for k in ("apiRequests", "apiRequestsDate", "dailyRateLimit", "extraLimit")}
 
 
+def counted(before, after):
+    """Kall trukket denne kjøringen: økning i dagstelleren + nedgang i bonusen (extraLimit)."""
+    try:
+        return (int(after["apiRequests"]) - int(before["apiRequests"])) + \
+               (int(before.get("extraLimit") or 0) - int(after.get("extraLimit") or 0))
+    except (TypeError, ValueError, KeyError):
+        return ""
+
+
 def log_usage(mode, before, after, own_calls):
     fields = ["run_at_utc", "mode", "script_requests", "api_before", "api_after",
               "counted_this_run", "daily_limit", "extra_limit"]
@@ -256,7 +265,7 @@ def log_usage(mode, before, after, own_calls):
         "run_at_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "mode": mode, "script_requests": own_calls,
         "api_before": "" if b is None else b, "api_after": "" if a is None else a,
-        "counted_this_run": a - b if same_day and isinstance(a, int) and isinstance(b, int) else "",
+        "counted_this_run": counted(before, after) if same_day else "",
         "daily_limit": (after or before or {}).get("dailyRateLimit", ""),
         "extra_limit": (after or before or {}).get("extraLimit", ""),
     })
