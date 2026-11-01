@@ -1,0 +1,12 @@
+# Aksjer som eies av minst én portefølje. Hentes hver børsdag.
+# Alle aksjene i universe.csv hentes på fredager. OBX hentes alltid.
+FRO
+KOG
+EQNR
+MOWI
+NOD
+DNB
+GJF
+ORK
+HAUTO
+KMAR
