@@ -232,6 +232,40 @@ def update_dividends(tickers, universe):
     return new_rows
 
 
+# ---------------------------------------------------------------- kvote
+def account_usage():
+    """Leser kontoens kallteller. Bare tall lagres – aldri navn eller e-post."""
+    data = get("user")
+    if not isinstance(data, dict):
+        return None
+    return {k: data.get(k) for k in ("apiRequests", "apiRequestsDate", "dailyRateLimit", "extraLimit")}
+
+
+def log_usage(mode, before, after, own_calls):
+    fields = ["run_at_utc", "mode", "script_requests", "api_before", "api_after",
+              "counted_this_run", "daily_limit", "extra_limit"]
+    file = path("data", "usage.csv")
+    rows = []
+    if os.path.exists(file):
+        with open(file, newline="", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+    b = (before or {}).get("apiRequests")
+    a = (after or {}).get("apiRequests")
+    same_day = before and after and before.get("apiRequestsDate") == after.get("apiRequestsDate")
+    rows.append({
+        "run_at_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "mode": mode, "script_requests": own_calls,
+        "api_before": "" if b is None else b, "api_after": "" if a is None else a,
+        "counted_this_run": a - b if same_day and isinstance(a, int) and isinstance(b, int) else "",
+        "daily_limit": (after or before or {}).get("dailyRateLimit", ""),
+        "extra_limit": (after or before or {}).get("extraLimit", ""),
+    })
+    with open(file, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=fields, lineterminator="\n")
+        w.writeheader()
+        w.writerows(rows)
+
+
 # ---------------------------------------------------------------- main
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "prices-daily"
@@ -242,6 +276,8 @@ def main():
     universe = load_universe()
     daily = [t for t in load_daily() if t in universe]
     result = {}
+    before = account_usage()
+    start_calls = calls
     try:
         if mode in ("prices-daily", "prices-full", "all"):
             tickers = list(universe) if mode != "prices-daily" else daily + ["OBX"]
@@ -252,6 +288,10 @@ def main():
             result["dividend_rows"] = len(update_dividends(daily, universe))
     except LimitReached:
         errors.append("API-kvoten for i dag er brukt opp; resten hentes neste kjøring.")
+    own = calls - start_calls
+    after = account_usage()
+    log_usage(mode, before, after, own)
+    result["account"] = after
     status = {
         "run_at_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "mode": mode, "api_calls": calls, **result, "notes": notes, "errors": errors,
