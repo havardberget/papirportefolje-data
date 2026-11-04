@@ -148,7 +148,9 @@ def update_prices(tickers, universe):
                 break
 
     # 2) Dagens kurs fra sanntidsendepunktet (15 min forsinket), ett samlet kall
-    missing = [t for t in tickers if (today_s, t) not in have and today.weekday() < 5]
+    # Fond (.EUFUND) har ikke sanntidskurs; kursen (NAV) kommer dagen etter via sluttkurs-endepunktet
+    missing = [t for t in tickers if (today_s, t) not in have and today.weekday() < 5
+               and not universe[t][0].endswith(".EUFUND")]
     syms = {t: universe[t][0] for t in missing}
     if syms:
         first, *rest = list(syms.values())

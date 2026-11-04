@@ -1,5 +1,6 @@
 # Aksjer som eies av minst én portefølje. Hentes hver børsdag.
 # Alle aksjene i universe.csv hentes på fredager. OBX hentes alltid.
+# DNBGI = fondet DNB Global Indeks A (sammenligning i grafen, eies ikke).
 FRO
 KOG
 EQNR
@@ -10,3 +11,4 @@ GJF
 ORK
 HAUTO
 KMAR
+DNBGI
