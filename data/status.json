@@ -1,13 +1,13 @@
 {
-  "run_at_utc": "2026-11-05T22:19:44Z",
-  "mode": "prices-daily",
-  "api_calls": 5,
-  "prices_added": 12,
+  "run_at_utc": "2026-11-06T21:45:47Z",
+  "mode": "prices-full",
+  "api_calls": 14,
+  "prices_added": 31,
   "account": {
     "apiRequests": 12,
-    "apiRequestsDate": "2026-11-05",
+    "apiRequestsDate": "2026-11-06",
     "dailyRateLimit": 20,
-    "extraLimit": 438
+    "extraLimit": 428
   },
   "notes": [],
   "errors": []
