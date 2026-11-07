@@ -169,6 +169,17 @@ def update_prices(tickers, universe):
                 if d == today_s:
                     add(d, t, c, "rt")
 
+    # 3) Fikk vi ikke dagens kurs fra sanntidsendepunktet (gjelder bl.a. OBX), prøv sluttkurs-endepunktet
+    still = [t for t in tickers if (today_s, t) not in have and today.weekday() < 5
+             and not universe[t][0].endswith(".EUFUND")]
+    for t in still:
+        data = get(f"eod/{universe[t][0]}", **{"from": today_s, "to": today_s})
+        if isinstance(data, list):
+            for d in data:
+                c = num(d.get("close"))
+                if c:
+                    add(d["date"][:10], t, c, "eod")
+
     rows.sort(key=lambda r: (r["date"], r["ticker"]))
     write_csv("prices.csv", ["date", "ticker", "close", "source"], rows)
     return added
@@ -290,6 +301,9 @@ def main():
     before = account_usage()
     start_calls = calls
     try:
+        if mode == "dividends":
+            # Lørdag: fyll eventuelle hull fra fredag (f.eks. OBX eller fond) før utbytte hentes
+            result["prices_added"] = len(update_prices(daily + ["OBX"], universe))
         if mode in ("prices-daily", "prices-full", "all"):
             tickers = list(universe) if mode != "prices-daily" else daily + ["OBX"]
             # Eide aksjer og OBX først, i tilfelle kvoten tar slutt underveis
