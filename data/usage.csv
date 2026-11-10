@@ -9,3 +9,4 @@ run_at_utc,mode,script_requests,api_before,api_after,counted_this_run,daily_limi
 2026-11-07T09:46:24Z,all,13,12,13,,20,428
 2026-11-07T14:30:14Z,dividends,12,13,20,12,20,423
 2026-11-10T00:26:48Z,prices-daily,24,0,20,,20,409
+2026-11-10T21:58:19Z,prices-daily,3,20,20,13,20,396
