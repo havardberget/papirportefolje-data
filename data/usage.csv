@@ -18,3 +18,4 @@ run_at_utc,mode,script_requests,api_before,api_after,counted_this_run,daily_limi
 2026-11-17T23:39:24Z,prices-daily,3,20,20,13,20,359
 2026-11-18T23:09:39Z,prices-daily,3,20,13,,20,359
 2026-11-19T23:14:35Z,prices-daily,3,13,13,,20,359
+2026-11-20T22:49:58Z,prices-full,13,13,13,,20,349
