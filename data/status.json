@@ -1,14 +1,13 @@
 {
-  "run_at_utc": "2026-11-21T15:46:35Z",
-  "mode": "dividends",
-  "api_calls": 14,
-  "prices_added": 1,
-  "dividend_rows": 3,
+  "run_at_utc": "2026-11-24T03:03:51Z",
+  "mode": "prices-daily",
+  "api_calls": 26,
+  "prices_added": 12,
   "account": {
-    "apiRequests": 12,
-    "apiRequestsDate": "2026-11-21",
+    "apiRequests": 20,
+    "apiRequestsDate": "2026-11-24",
     "dailyRateLimit": 20,
-    "extraLimit": 349
+    "extraLimit": 335
   },
   "notes": [],
   "errors": []
