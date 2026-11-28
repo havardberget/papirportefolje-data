@@ -1,4 +1,5 @@
 ticker,ex_date,pay_date,declared,value,currency,fx,value_nok,flag
 EQNR,2026-11-13,2026-11-25,2026-07-21,3.65,NOK,1,3.65,
 MOWI,2026-11-13,2026-11-23,2026-11-03,2.3,NOK,1,2.3,
+HAUTO,2026-11-23,2026-11-30,2026-11-18,5.0461,NOK,1,5.0461,
 EQNR,2027-02-15,2027-02-26,2026-10-27,0.39,NOK,1,0.39,sjekk beløp/valuta
